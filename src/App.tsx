@@ -1,5 +1,6 @@
 import './App.css'
-import Grid from '@mui/material/Grid2' 
+import Grid from '@mui/material/Grid2'
+import IndicatorWeather from './components/IndicatorWeather'; 
 
 function App() {
   return (
