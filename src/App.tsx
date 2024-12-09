@@ -7,11 +7,7 @@ import LineChartWeather from './components/LineChartWeather';
 import Item from './interface/Item.tsx';
  {/* Hooks */ }
  import { useEffect, useState } from 'react';
-let items: "";
 
-function setItems(items){
-
-}
  interface Indicator {
   title?: String;
   subtitle?: String;
@@ -21,7 +17,7 @@ function setItems(items){
 function App() {
    {/* Variable de estado y función de actualización */}
    let [indicators, setIndicators] = useState<Indicator[]>([])
-   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"))
+    let [items, setItems] = useState<Item[]>([])
 
    {/* Hook: useEffect */}
    useEffect(()=>{
@@ -63,6 +59,40 @@ function App() {
 
         {/* Modificación de la variable de estado mediante la función de actualización */}
         setIndicators( dataToIndicators )
+        
+        let dataToItems : Item[] = new Array<Item>();
+        let timeNodes = xml.getElementsByTagName("time");
+        for( let i = 0; i < 6; i++ ) {
+            //Nodo actual
+            let timeNode = timeNodes[i];
+            //from + to
+            let from = timeNode.getAttribute("from") || "";
+            let to = timeNode.getAttribute("to") || "";
+
+            // precipitation - probability
+            let precipitation = timeNode.getElementsByTagName("precipitation")[0]
+            let probability = precipitation.getAttribute("probability") || ""
+
+            //humidity - value
+            let humidity = timeNode.getElementsByTagName("humidity")[0]
+            let value = humidity.getAttribute("value") || ""
+
+            //clouds - all
+            let clouds = timeNode.getElementsByTagName("clouds")[0]
+            let all = clouds.getAttribute("all") || ""
+
+            dataToItems.push({
+                dateStart: from,
+                dateEnd: to,
+                precipitation: probability,
+                humidity: value,
+                clouds: all
+            });
+
+        }
+        setItems (dataToItems)
+        
+
     }
 
     request();
@@ -88,12 +118,6 @@ let renderIndicators = () => {
     <Grid container spacing={5}>
       
         {/* Indicadores */}
-        {/*
-        <Grid size={{ xs: 12, xl: 3 }}><IndicatorWeather title={'Indicator 1'} subtitle={'Unidad 1'} value={"1.23"} /></Grid>
-        <Grid size={{ xs: 12, xl: 3 }}><IndicatorWeather title={'Indicator 2'} subtitle={'Unidad 2'} value={"3.12"} /></Grid>
-        <Grid size={{ xs: 12, xl: 3 }}><IndicatorWeather title={'Indicator 3'} subtitle={'Unidad 3'} value={"2.31"} /> </Grid>
-        <Grid size={{ xs: 12, xl: 3 }}> <IndicatorWeather title={'Indicator 4'} subtitle={'Unidad 4'} value={"3.21"} /></Grid>
-       */}
        {renderIndicators()}
         {/* Tabla */}
         <Grid size={{ xs: 12, xl: 8 }}>
@@ -103,7 +127,7 @@ let renderIndicators = () => {
                          <ControlWeather/>
                      </Grid>
                      <Grid size={{ xs: 12, xl: 9 }}>
-                         <TableWeather/>
+                         <TableWeather itemsIn ={ items }/>
                      </Grid>
                  </Grid>
         </Grid>

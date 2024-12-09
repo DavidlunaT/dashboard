@@ -23,6 +23,7 @@ const handleChange = (event: SelectChangeEvent) => {
 
     let idx = parseInt(event.target.value)
     // alert( idx );
+    alert(selected);
     setSelected( idx );
 
     {/* Modificación de la referencia descriptionRef */}
